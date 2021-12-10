@@ -1,4 +1,4 @@
-setwd("~/UNI/NECSTCamp/StPetersburgINCART")
+setwd("~/UNI/NECSTCamp/StPetersbirg_git/ECGanalysis")
 
 # dataset con i battiti
 df1 <- read.csv('HB_I01/Signals.csv', header = TRUE)
