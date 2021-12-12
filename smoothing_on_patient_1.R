@@ -177,7 +177,7 @@ points(time,smooth ,type="l",col="green",lwd=2)
 
 # mmh
 
-# -----------------------------
+# -------curva T----------------------
 #### vado di curvaT
 
 time = 1:length(curvaT)
