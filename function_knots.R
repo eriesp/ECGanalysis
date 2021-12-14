@@ -44,7 +44,7 @@ find_knots <- function(n,lenHB,rpeak,punti_medi, plot = FALSE, frazioni = c('R' 
   interval = (length(other) / (n*(1-frazioni[1]-frazioni[2]-frazioni[3])))  # splitto uniformemente i restanti valori
   
   nodi_other = other[seq(1, length(other), interval)]
-  nodi_other=c(nodi_other,end)
+  nodi_other = c(nodi_other,lenHB)
   length(nodi_other)
   
   knots = sort(c(nodiR,nodiP,nodiT,nodi_other))
@@ -94,7 +94,7 @@ smoothing <- function(signal, rpeak, punti_medi) {
   # plot dei nodi
   # plot del segnale con punti di intersse e knots
   x11()
-  plot(signal, lwd = 2, col = 'black', type = 'l', ylim = c(-0.2,0.5))
+  plot(signal, lwd = 2, col = 'black', type = 'l', ylim = c(-0.2,1))
   points(nodi,rep(-0.2,length(nodi)), pch = 4)
   abline(h = -0.2, col = 'red')
   abline(v = c(punti_medi[c(2,3,5,7,9,10)]+rpeak), lty = 2, col = 'red')
@@ -122,4 +122,4 @@ smoothing <- function(signal, rpeak, punti_medi) {
 }
 
 
-
+save(find_knots,smoothing, file = "R_functions/smoothin_and_knots_func.RData")

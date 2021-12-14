@@ -3,13 +3,10 @@ setwd("~/UNI/NECSTCamp/StPetersbirg_git/ECGanalysis")
 load("R_functions/smoothin_and_knots_func.RData")
 
 library(fda)
-library(dplyr)
 
 
 df <- read.csv('HB_I03/Signals.csv', header = TRUE)
 head(df)
-
-df %>% select(-mean)
 
 HB_mean = rowMeans(df)
 
