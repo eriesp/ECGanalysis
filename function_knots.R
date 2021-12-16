@@ -12,7 +12,7 @@
 find_knots <- function(n,lenHB,rpeak,punti_medi, plot = FALSE, frazioni = c('R' = 2/5, 'P' = 1/6, 'T' = 1/6)) {
   
   # knots in curva R
-  nodiR = seq(from = rpeak + punti_medi[5] - 1,to = rpeak + punti_medi[7] + 2,length.out = n*frazioni[1])
+  nodiR = seq(from = rpeak + punti_medi[5] - 1,to = rpeak + punti_medi[6] + 2,length.out = n*frazioni[1])
   lenR = length(nodiR)
   
   # knots in curva P
@@ -35,7 +35,7 @@ find_knots <- function(n,lenHB,rpeak,punti_medi, plot = FALSE, frazioni = c('R' 
   tratto3 = (nodiR[lenR]+1):(nodiT[1]-1)  # nodi tra R e T
   len3 = length(tratto3)
   
-  tratto4 = (nodiT[lenT]+1):(length(HB_mean))  # nodi tra T e end
+  tratto4 = (nodiT[lenT]+1):(lenHB)  # nodi tra T e end
   len4 = length(tratto4)
   
   other = c(tratto1,tratto2,tratto3,tratto4)  
@@ -97,7 +97,7 @@ smoothing <- function(signal, rpeak, punti_medi) {
   plot(signal, lwd = 2, col = 'black', type = 'l', ylim = c(-0.2,1))
   points(nodi,rep(-0.2,length(nodi)), pch = 4)
   abline(h = -0.2, col = 'red')
-  abline(v = c(punti_medi[c(2,3,5,7,9,10)]+rpeak), lty = 2, col = 'red')
+  abline(v = c(punti_medi[c(2,3,5,6,9,10)]+rpeak), lty = 2, col = 'red')
   
   # smoothin
   basis <- create.bspline.basis(c(0,length(signal)), breaks = nodi, norder = 3)
