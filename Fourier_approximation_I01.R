@@ -19,11 +19,12 @@ time = 1:169
 
 library(fda) 
 
-firstHB = df1$X0
 
+HB_mean = rowMeans(df1)
 
 basis <- create.fourier.basis(rangeval=c(0,169),nbasis=31)
 data_HB.fb <- Data2fd(y = firstHB,argvals = time,basisobj = basis)
+
 plot.fd(data_HB.fb)
-points(time,firstHB ,type="l",col="blue",lwd=1)
+points(time,HB_mean, col = 'grey')
 

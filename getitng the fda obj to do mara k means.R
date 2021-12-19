@@ -7,7 +7,7 @@ library(fda)
 library(fdakma)
 
 
-# no ok non posso perché hanno tutti lunghezze differenti
+# hanno tutti lunghezze differenti
 
 # rifaccio lo smoothing di tutte le func ottenendo il fda object
 
@@ -26,10 +26,7 @@ indeces = c(1,2,3,4,6,8,9,13,15,19,21,23,26,27,29,33,34,35,37,38,39,40,
 length(indeces)
 
 
-
 i = 42
-
-
 
 df <- read.csv(paste(names[indeces[i]],'/Smooth.csv',sep = ''), header = TRUE)
 dim(df)
@@ -109,7 +106,9 @@ length(list.of.fda)
 ### ora che ho gli fobj di tutti li valuto su intervallo 1:200
 # e li aggiungo tutti alla stessa matrice
 
-time = seq(1,169,length.out = 200)
+load('lista_dei_fobj.RData')
+
+time = seq(1,169,length.out = 500)
 
 basismat.fd = list.of.fda[1]$i
 
@@ -127,7 +126,7 @@ for (i in 2:length(list.of.fda)){
   file = paste(names[indeces[i]],'/Smooth.csv',sep = '')
   df = read.csv(file, header = TRUE)
   
-  time = seq(1,dim(df)[1],length.out = 200)
+  time = seq(1,dim(df)[1],length.out = 500)
   
   basismat.fd = list.of.fda[[i]]
   
@@ -140,11 +139,53 @@ for (i in 2:length(list.of.fda)){
 }
 
 matplot(t(Y0), type = 'l', xlab = 'index')
+matplot(t(Y1), type = 'l', xlab = 'index')
+
+# saving these points to export them
+write.csv(data.frame(Y0),file = 'Y0.csv', row.names = FALSE)
+write.csv(data.frame(Y1),file = 'Y1.csv', row.names = FALSE)
+
+
+#### rescaling the data to i punti noti su intervallo 1:200 ####
+# punti noti: P_onset P_offset, R_onset, R_offset, T_offset
+# dei punti medi sono [2,3,5,6,10]
+
+
+for (i in 1:length(indeces)){
+  smooth_vec_filename = paste(names[indeces[i]],'/Smooth.csv',sep = '')
+  smooth_vec = read.csv(smooth_vec_filename, header = TRUE)
+  rpeak = ceiling(dim(smooth_vec)[1] / 2)
+  
+  file = paste(names[indeces[i]],'/Punti_medi.csv',sep = '')
+  punti = read.csv(file, header = TRUE) + rpeak
+  
+  punti = punti*200/(dim(smooth_vec)[1])
+  
+  write.csv(punti, file, row.names = FALSE)
+}
+
+# concateno tutti questi punti in un'unica matrice
+points.matrix = t(read.csv('HB_I01/Punti_medi.csv', header = TRUE))
+
+for (i in 2:length(indeces)){
+
+  file = paste(names[indeces[i]],'/Punti_medi.csv',sep = '')
+  punti = t(read.csv(file, header = TRUE))
+  
+  points.matrix = rbind(points.matrix,punti)
+}
+
+write.csv(points.matrix, file = "punti_per_smoothed_data.csv")
+
+#### K-means ####
+
+Y0 = read.csv('Y0.csv', header = TRUE)
+Y1 = read.csv('Y1.csv', header = TRUE)
 
 
 # k - mean effettivo
 
-time = 1:200
+time = 1:500
 
 fdakma_example <- kma(
   x=time, y0=Y0, n.clust = 3, 
@@ -184,6 +225,7 @@ fdakma_example <- kma(
 )
 
 kma.show.results(fdakma_example)
+fdakma_example$labels
 
 # con k = 8 la varibilità non migliora
 
@@ -202,3 +244,38 @@ fdakma_example <- kma(
 )
 
 kma.show.results(fdakma_example)
+
+
+
+
+
+kma.compare_example <- kma.compare (
+  x=time, y0=Y0, y1=Y1, n.clust = 3:8, 
+  warping.method = c('affine'), 
+  similarity.method = 'd1.pearson',
+  center.method = 'k-means',
+  plot.graph=1)
+
+
+# k = 5
+fdakma_example <- kma(
+  x=time, y0=Y0, y1 = Y1, n.clust = 6, 
+  warping.method = 'affine', 
+  similarity.method = 'd1.pearson',  # similarity computed as the cosine
+  # between the derivative functions
+  # (correlation)
+  center.method = 'k-means'
+  #seeds = rep(1,4) # you can give a little help to the algorithm...
+)
+
+kma.show.results(fdakma_example)
+
+
+kma.compare_example <- kma.compare (
+  x=time, y0=Y0, y1=Y1, n.clust = 4:7, 
+  warping.method = c('affine'), 
+  similarity.method = 'd0.pearson',
+  center.method = 'k-means',
+  plot.graph=1)
+
+table(fdakma_example$labels,indeces)
